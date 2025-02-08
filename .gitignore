@@ -64,5 +64,4 @@ package-lock.json
 
 /coverage
 /third-party
-lib/
 .yarn
