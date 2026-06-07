@@ -64,6 +64,7 @@ class RNZendesk: RCTEventEmitter {
     func showHelpCenter(with options: [String: Any]) {
         DispatchQueue.main.async {
             let hcConfig = HelpCenterUiConfiguration()
+            let requestConfig = RequestUiConfiguration()
 
             if let hideContactSupport = options["hideContactSupport"] as? Bool {
                 hcConfig.showContactOptions = !hideContactSupport
@@ -71,7 +72,14 @@ class RNZendesk: RCTEventEmitter {
                 hcConfig.showContactOptions = true
             }
 
-            let helpCenter = HelpCenterUi.buildHelpCenterOverviewUi(withConfigs: [hcConfig])
+            if let subject = options["subject"] as? String {
+                requestConfig.subject = subject
+            }
+
+            if let tags = options["tags"] as? [String] {
+                requestConfig.tags = tags
+            }
+            let helpCenter = HelpCenterUi.buildHelpCenterOverviewUi(withConfigs: [hcConfig,requestConfig])
             
             let nvc = UINavigationController(rootViewController: helpCenter)
             UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true, completion: nil)
@@ -108,6 +116,25 @@ class RNZendesk: RCTEventEmitter {
             let requestListController = RequestUi.buildRequestList()
             
             let nvc = UINavigationController(rootViewController: requestListController)
+            UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true)
+        }
+    }
+
+    @objc(showArticle:)
+    func showArticle(with options: [String: Any]) {
+        DispatchQueue.main.async {
+            let articleUiConfig = ArticleUiConfiguration()
+            if let hideContactSupport = options["hideContactSupport"] as? Bool {
+                articleUiConfig.showContactOptions = !hideContactSupport
+            } else {
+                articleUiConfig.showContactOptions = false
+            }
+
+            guard let articleId = options["articleId"] as? String else { return }
+
+            let articleController = HelpCenterUi.buildHelpCenterArticleUi(withArticleId: articleId, andConfigs: [articleUiConfig])
+            
+            let nvc = UINavigationController(rootViewController: articleController)
             UIApplication.shared.keyWindow?.rootViewController?.present(nvc, animated: true)
         }
     }
