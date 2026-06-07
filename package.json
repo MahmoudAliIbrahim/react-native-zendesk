@@ -4,16 +4,7 @@
   "description": "Zendesk SDK for React Native.",
   "main": "lib/index.js",
   "types": "lib/index.d.tsx",
-  "scripts": {
-    "build": "rimraf lib && tsc",
-    "lint": "eslint \"src/*.tsx\"",
-    "format": "prettier --write \"src/*.tsx\"",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn lint",
-    "preversion": "yarn lint",
-    "version": "yarn format && git add -A src",
-    "postversion": "git push && git push --tags"
-  },
+  "scripts": {},
   "files": [
     "lib/**/*",
     "ios/**/*",
