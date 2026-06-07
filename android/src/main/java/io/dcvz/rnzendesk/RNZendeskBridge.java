@@ -5,17 +5,6 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import zendesk.commonui.UiConfig;
-import zendesk.core.Zendesk;
-import zendesk.core.Identity;
-import zendesk.core.JwtIdentity;
-import zendesk.core.AnonymousIdentity;
-import zendesk.support.CustomField;
-import zendesk.support.Support;
-import zendesk.support.guide.HelpCenterActivity;
-import zendesk.support.request.RequestActivity;
-import zendesk.support.requestlist.RequestListActivity;
-
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
@@ -24,6 +13,18 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import zendesk.configurations.Configuration;
+import zendesk.core.AnonymousIdentity;
+import zendesk.core.Identity;
+import zendesk.core.JwtIdentity;
+import zendesk.core.Zendesk;
+import zendesk.support.CustomField;
+import zendesk.support.Support;
+import zendesk.support.guide.HelpCenterActivity;
+import zendesk.support.request.RequestActivity;
+import zendesk.support.requestlist.RequestListActivity;
+import zendesk.support.guide.ViewArticleActivity;
 
 public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
@@ -70,13 +71,14 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void showHelpCenter(ReadableMap options) {
-//        Boolean hideContact = options.getBoolean("hideContactUs") || false;
-        UiConfig hcConfig = HelpCenterActivity.builder()
-                .withContactUsButtonVisible(!(options.hasKey("hideContactSupport") && options.getBoolean("hideContactSupport")))
+        ArrayList tags = options.getArray("tags").toArrayList();
+        
+        Configuration hcConfig = RequestActivity.builder()
+                .withTags(tags)
                 .config();
 
         Intent intent = HelpCenterActivity.builder()
-                .withContactUsButtonVisible(true)
+                .withContactUsButtonVisible(!(options.hasKey("hideContactSupport") && options.getBoolean("hideContactSupport")))
                 .intent(getReactApplicationContext(), hcConfig);
 
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -108,9 +110,16 @@ public class RNZendeskBridge extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void showTicketList() {
-        Intent intent = RequestListActivity.builder()
-                .intent(getReactApplicationContext());
+        RequestListActivity.builder()
+            .show(getReactApplicationContext());
+    }
 
+    @ReactMethod
+    public void showArticle(ReadableMap options) {
+        Intent intent =  ViewArticleActivity.builder(Long.parseLong(options.getString("articleId")))
+                .withContactUsButtonVisible(!(options.hasKey("hideContactSupport") && options.getBoolean("hideContactSupport")))
+                .intent(getReactApplicationContext());
+        
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getReactApplicationContext().startActivity(intent);
     }
